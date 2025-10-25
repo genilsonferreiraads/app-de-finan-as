@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { Page } from '../types';
+import { Link } from 'react-router-dom';
 
 interface LoginPageProps {
   onLogin: (rememberMe: boolean) => void;
-  setActivePage: (page: Page) => void;
 }
 
-const LoginPage: React.FC<LoginPageProps> = ({ onLogin, setActivePage }) => {
+const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +51,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, setActivePage }) => {
                 <label className="block text-sm font-medium text-text-light dark:text-text-dark" htmlFor="password">
                   Senha
                 </label>
-                <a href="#" onClick={(e) => { e.preventDefault(); setActivePage('forgot-password'); }} className="text-sm font-medium text-primary hover:underline">Esqueceu a senha?</a>
+                <Link to="/forgot-password" className="text-sm font-medium text-primary hover:underline">Esqueceu a senha?</Link>
               </div>
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted-light dark:text-text-muted-dark">lock</span>
@@ -83,9 +82,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, setActivePage }) => {
           </form>
           <p className="mt-8 text-center text-sm text-text-muted-light dark:text-text-muted-dark">
             Não tem uma conta?{' '}
-            <a href="#" onClick={(e) => { e.preventDefault(); setActivePage('sign-up'); }} className="font-medium text-primary hover:underline">
+            <Link to="/signup" className="font-medium text-primary hover:underline">
               Criar conta
-            </a>
+            </Link>
           </p>
         </div>
       </div>

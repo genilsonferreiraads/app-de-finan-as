@@ -1,15 +1,13 @@
 import React from 'react';
-import { Page } from '../types';
+import { Link, useNavigate } from 'react-router-dom';
 
-interface ForgotPasswordPageProps {
-  setActivePage: (page: Page) => void;
-}
+const ForgotPasswordPage: React.FC = () => {
+  const navigate = useNavigate();
 
-const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({ setActivePage }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     alert('Se o e-mail estiver correto, você receberá um link para redefinir sua senha.');
-    setActivePage('dashboard'); // Redirect to login
+    navigate('/login');
   };
 
   return (
@@ -36,9 +34,9 @@ const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({ setActivePage }
           </form>
           <p className="mt-8 text-center text-sm text-text-muted-light dark:text-text-muted-dark">
             Lembrou a senha?{' '}
-            <a href="#" onClick={(e) => { e.preventDefault(); setActivePage('dashboard'); }} className="font-medium text-primary hover:underline">
+            <Link to="/login" className="font-medium text-primary hover:underline">
               Voltar para o login
-            </a>
+            </Link>
           </p>
         </div>
       </div>

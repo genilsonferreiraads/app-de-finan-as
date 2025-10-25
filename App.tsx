@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Routes, Route, Outlet, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import SideNav from './components/SideNav';
 import MobileHeader from './components/MobileHeader';
 import DashboardPage from './pages/DashboardPage';
@@ -10,18 +11,50 @@ import LoginPage from './pages/LoginPage';
 import AllTransactionsPage from './pages/AllTransactionsPage';
 import SignUpPage from './pages/SignUpPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import { Page, User, Transaction, Category } from './types';
+import { User, Transaction, Category } from './types';
 import { MOCK_USER, MOCK_TRANSACTIONS, MOCK_CATEGORIES } from './data/mockData';
-import { RechartsRoot } from 'recharts';
+
+// Main layout for authenticated users
+const MainLayout: React.FC<{
+  user: User;
+  onLogout: () => void;
+  isMobileNavOpen: boolean;
+  setIsMobileNavOpen: (isOpen: boolean) => void;
+}> = ({ user, onLogout, isMobileNavOpen, setIsMobileNavOpen }) => {
+  const location = useLocation();
+
+  useEffect(() => {
+    setIsMobileNavOpen(false);
+  }, [location.pathname, setIsMobileNavOpen]);
+
+  return (
+    <div className="relative flex w-full min-h-screen">
+      <SideNav
+        user={user}
+        onLogout={onLogout}
+        isMobileNavOpen={isMobileNavOpen}
+        onCloseMobileNav={() => setIsMobileNavOpen(false)}
+      />
+      <div className="flex flex-col flex-1 min-w-0">
+        <MobileHeader onMenuClick={() => setIsMobileNavOpen(true)} />
+        <main className="flex-1 p-6 sm:p-8 md:p-10 overflow-y-auto mt-16 md:mt-0">
+          <div className="max-w-7xl mx-auto">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+};
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activePage, setActivePage] = useState<Page>('dashboard');
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [user, setUser] = useState<User>(MOCK_USER);
   const [transactions, setTransactions] = useState<Transaction[]>(MOCK_TRANSACTIONS);
   const [categories, setCategories] = useState<Category[]>(MOCK_CATEGORIES);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (localStorage.getItem('financeAppIsAuthenticated') === 'true') {
@@ -40,76 +73,56 @@ const App: React.FC = () => {
 
   const addTransaction = useCallback((newTransaction: Omit<Transaction, 'id'>) => {
     setTransactions(prev => [{ ...newTransaction, id: Date.now().toString() }, ...prev]);
-    setActivePage('dashboard');
-  }, []);
-
-  const handleSetActivePage = (page: Page) => {
-    setActivePage(page);
-    setIsMobileNavOpen(false);
-  };
+    navigate('/');
+  }, [navigate]);
 
   const handleLogin = (rememberMe: boolean) => {
     setIsAuthenticated(true);
     if (rememberMe) {
       localStorage.setItem('financeAppIsAuthenticated', 'true');
     }
+    navigate('/');
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('financeAppIsAuthenticated');
-    setActivePage('dashboard');
-    setIsMobileNavOpen(false);
+    navigate('/login');
   };
-
-  const renderPage = () => {
-    switch (activePage) {
-      case 'dashboard':
-        return <DashboardPage transactions={transactions} categories={categories} setActivePage={handleSetActivePage} />;
-      case 'transactions':
-        return <AddTransactionPage categories={categories} addTransaction={addTransaction} setActivePage={handleSetActivePage} />;
-      case 'all-transactions':
-        return <AllTransactionsPage transactions={transactions} categories={categories} />;
-      case 'categories':
-        return <CategoriesPage categories={categories} setCategories={setCategories} />;
-      case 'reports':
-        return <ReportsPage transactions={transactions} categories={categories} />;
-      case 'profile':
-        return <ProfilePage user={user} setUser={setUser} />;
-      case 'sign-up':
-        return <SignUpPage setActivePage={handleSetActivePage} />;
-      case 'forgot-password':
-        return <ForgotPasswordPage setActivePage={handleSetActivePage} />;
-      default:
-        return <DashboardPage transactions={transactions} categories={categories} setActivePage={handleSetActivePage} />;
-    }
-  };
-  
-  if (!isAuthenticated) {
-    if (activePage === 'sign-up') return <SignUpPage setActivePage={handleSetActivePage} />;
-    if (activePage === 'forgot-password') return <ForgotPasswordPage setActivePage={handleSetActivePage} />;
-    return <LoginPage onLogin={handleLogin} setActivePage={handleSetActivePage} />;
-  }
 
   return (
-    <div className="relative flex w-full min-h-screen">
-      <SideNav 
-        activePage={activePage} 
-        setActivePage={handleSetActivePage} 
-        user={user} 
-        onLogout={handleLogout}
-        isMobileNavOpen={isMobileNavOpen}
-        onCloseMobileNav={() => setIsMobileNavOpen(false)}
+    <Routes>
+      <Route path="/login" element={!isAuthenticated ? <LoginPage onLogin={handleLogin} /> : <Navigate to="/" />} />
+      <Route path="/signup" element={!isAuthenticated ? <SignUpPage /> : <Navigate to="/" />} />
+      <Route path="/forgot-password" element={!isAuthenticated ? <ForgotPasswordPage /> : <Navigate to="/" />} />
+
+      {/* Protected Routes */}
+      <Route
+        path="/*"
+        element={
+          isAuthenticated ? (
+            <MainLayout 
+              user={user} 
+              onLogout={handleLogout} 
+              isMobileNavOpen={isMobileNavOpen}
+              setIsMobileNavOpen={setIsMobileNavOpen}
+            >
+              <Routes>
+                  <Route path="/" element={<DashboardPage transactions={transactions} categories={categories} />} />
+                  <Route path="/transactions/add" element={<AddTransactionPage categories={categories} addTransaction={addTransaction} />} />
+                  <Route path="/transactions" element={<AllTransactionsPage transactions={transactions} categories={categories} />} />
+                  <Route path="/categories" element={<CategoriesPage categories={categories} setCategories={setCategories} />} />
+                  <Route path="/reports" element={<ReportsPage transactions={transactions} categories={categories} />} />
+                  <Route path="/profile" element={<ProfilePage user={user} setUser={setUser} />} />
+                  <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </MainLayout>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
       />
-      <div className="flex flex-col flex-1 min-w-0">
-        <MobileHeader onMenuClick={() => setIsMobileNavOpen(true)} />
-        <main className="flex-1 p-6 sm:p-8 md:p-10 overflow-y-auto mt-16 md:mt-0">
-          <div className="max-w-7xl mx-auto">
-            {renderPage()}
-          </div>
-        </main>
-      </div>
-    </div>
+    </Routes>
   );
 };
 

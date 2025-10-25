@@ -1,5 +1,3 @@
-export type Page = 'dashboard' | 'transactions' | 'categories' | 'reports' | 'profile' | 'all-transactions' | 'sign-up' | 'forgot-password';
-
 export interface User {
   name: string;
   email: string;

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { Transaction, Category, Page } from '../types';
+import { Link } from 'react-router-dom';
+import { Transaction, Category } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, Sector } from 'recharts';
 
 interface StatCardProps {
@@ -47,10 +48,9 @@ const TransactionItem: React.FC<{ transaction: Transaction, category?: Category 
 interface DashboardPageProps {
     transactions: Transaction[];
     categories: Category[];
-    setActivePage: (page: Page) => void;
 }
 
-const DashboardPage: React.FC<DashboardPageProps> = ({ transactions, categories, setActivePage }) => {
+const DashboardPage: React.FC<DashboardPageProps> = ({ transactions, categories }) => {
     
     const categoryMap = useMemo(() => new Map(categories.map(c => [c.id, c])), [categories]);
 
@@ -163,7 +163,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ transactions, categories,
                 <div className="rounded-xl p-6 bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-lg font-bold">Atividade Recente</h2>
-                        <a href="#" onClick={(e) => { e.preventDefault(); setActivePage('all-transactions'); }} className="text-sm font-bold text-primary hover:underline">Ver Todos</a>
+                        <Link to="/transactions" className="text-sm font-bold text-primary hover:underline">Ver Todos</Link>
                     </div>
                     <div className="flex flex-col divide-y divide-border-light dark:divide-border-dark">
                         {recentTransactions.map(t => <TransactionItem key={t.id} transaction={t} category={categoryMap.get(t.categoryId)} />)}

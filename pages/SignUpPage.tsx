@@ -1,15 +1,13 @@
 import React from 'react';
-import { Page } from '../types';
+import { Link, useNavigate } from 'react-router-dom';
 
-interface SignUpPageProps {
-  setActivePage: (page: Page) => void;
-}
+const SignUpPage: React.FC = () => {
+  const navigate = useNavigate();
 
-const SignUpPage: React.FC<SignUpPageProps> = ({ setActivePage }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     alert('Conta criada com sucesso! Você será redirecionado para o login.');
-    setActivePage('dashboard'); // Will be redirected to login page by App.tsx
+    navigate('/login');
   };
 
   return (
@@ -48,9 +46,9 @@ const SignUpPage: React.FC<SignUpPageProps> = ({ setActivePage }) => {
           </form>
           <p className="mt-8 text-center text-sm text-text-muted-light dark:text-text-muted-dark">
             Já tem uma conta?{' '}
-            <a href="#" onClick={(e) => { e.preventDefault(); setActivePage('dashboard'); }} className="font-medium text-primary hover:underline">
+            <Link to="/login" className="font-medium text-primary hover:underline">
               Fazer login
-            </a>
+            </Link>
           </p>
         </div>
       </div>

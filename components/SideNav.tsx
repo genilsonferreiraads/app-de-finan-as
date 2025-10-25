@@ -1,9 +1,8 @@
 import React from 'react';
-import { Page, User } from '../types';
+import { NavLink } from 'react-router-dom';
+import { User } from '../types';
 
 interface SideNavProps {
-  activePage: Page;
-  setActivePage: (page: Page) => void;
   user: User;
   onLogout: () => void;
   isMobileNavOpen: boolean;
@@ -13,33 +12,33 @@ interface SideNavProps {
 interface NavItemProps {
   icon: string;
   label: string;
-  page: Page;
-  activePage: Page;
-  setActivePage: (page: Page) => void;
+  to: string;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ icon, label, page, activePage, setActivePage }) => {
-  const isActive = activePage === page;
+const NavItem: React.FC<NavItemProps> = ({ icon, label, to }) => {
   return (
-    <a
-      href="#"
-      onClick={(e) => {
-        e.preventDefault();
-        setActivePage(page);
-      }}
-      className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-        isActive
-          ? 'bg-primary/20 text-text-light dark:text-text-dark font-medium'
-          : 'hover:bg-primary/10'
-      }`}
+    <NavLink
+      to={to}
+      end={to === "/"}
+      className={({ isActive }) =>
+        `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+          isActive
+            ? 'bg-primary/20 text-text-light dark:text-text-dark font-medium'
+            : 'hover:bg-primary/10'
+        }`
+      }
     >
-      <span className={`material-symbols-outlined ${isActive ? 'fill' : ''}`}>{icon}</span>
-      <p className="text-sm leading-normal">{label}</p>
-    </a>
+      {({ isActive }) => (
+        <>
+          <span className={`material-symbols-outlined ${isActive ? 'fill' : ''}`}>{icon}</span>
+          <p className="text-sm leading-normal">{label}</p>
+        </>
+      )}
+    </NavLink>
   );
 };
 
-const SideNav: React.FC<SideNavProps> = ({ activePage, setActivePage, user, onLogout, isMobileNavOpen, onCloseMobileNav }) => {
+const SideNav: React.FC<SideNavProps> = ({ user, onLogout, isMobileNavOpen, onCloseMobileNav }) => {
   return (
     <>
       {/* Overlay for mobile */}
@@ -67,11 +66,12 @@ const SideNav: React.FC<SideNavProps> = ({ activePage, setActivePage, user, onLo
               <span className="text-xl font-bold">FinanceApp</span>
             </div>
             <div className="flex flex-col gap-2">
-              <NavItem icon="dashboard" label="Dashboard" page="dashboard" activePage={activePage} setActivePage={setActivePage} />
-              <NavItem icon="receipt_long" label="Transações" page="transactions" activePage={activePage} setActivePage={setActivePage} />
-              <NavItem icon="sell" label="Categorias" page="categories" activePage={activePage} setActivePage={setActivePage} />
-              <NavItem icon="bar_chart" label="Relatórios" page="reports" activePage={activePage} setActivePage={setActivePage} />
-              <NavItem icon="person" label="Perfil" page="profile" activePage={activePage} setActivePage={setActivePage} />
+              <NavItem icon="dashboard" label="Dashboard" to="/" />
+              <NavItem icon="add_circle" label="Nova Transação" to="/transactions/add" />
+              <NavItem icon="receipt_long" label="Transações" to="/transactions" />
+              <NavItem icon="sell" label="Categorias" to="/categories" />
+              <NavItem icon="bar_chart" label="Relatórios" to="/reports" />
+              <NavItem icon="person" label="Perfil" to="/profile" />
             </div>
           </div>
           <div className="flex flex-col gap-2 border-t border-border-light dark:border-border-dark pt-4">

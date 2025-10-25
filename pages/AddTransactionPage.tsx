@@ -1,13 +1,14 @@
 import React, { useState, FormEvent, ChangeEvent } from 'react';
-import { Category, Transaction, Page } from '../types';
+import { useNavigate } from 'react-router-dom';
+import { Category, Transaction } from '../types';
 
 interface AddTransactionPageProps {
   categories: Category[];
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
-  setActivePage: (page: Page) => void;
 }
 
-const AddTransactionPage: React.FC<AddTransactionPageProps> = ({ categories, addTransaction, setActivePage }) => {
+const AddTransactionPage: React.FC<AddTransactionPageProps> = ({ categories, addTransaction }) => {
+  const navigate = useNavigate();
   const [type, setType] = useState<'expense' | 'income'>('expense');
   const [amount, setAmount] = useState('');
   const [categoryId, setCategoryId] = useState(categories.find(c => c.type === 'expense' || c.type === 'all')?.id || '');
@@ -44,7 +45,6 @@ const AddTransactionPage: React.FC<AddTransactionPageProps> = ({ categories, add
       description,
     });
     
-    // Reset form
     setAmount('');
     setDescription('');
     setFile(null);
@@ -122,7 +122,7 @@ const AddTransactionPage: React.FC<AddTransactionPageProps> = ({ categories, add
             </div>
           </div>
           <div className="flex items-center justify-end gap-4 pt-4">
-            <button onClick={() => setActivePage('dashboard')} type="button" className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-6 bg-transparent text-text-muted-light dark:text-gray-300 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-gray-200/50 dark:hover:bg-gray-800 transition-colors">
+            <button onClick={() => navigate('/')} type="button" className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-6 bg-transparent text-text-muted-light dark:text-gray-300 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-gray-200/50 dark:hover:bg-gray-800 transition-colors">
               <span className="truncate">Cancelar</span>
             </button>
             <button type="submit" className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-6 bg-primary text-text-light text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
