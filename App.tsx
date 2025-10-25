@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Routes, Route, Outlet, Navigate, useNavigate, useLocation } from 'react-router-dom';
+// FIX: Removed unused Outlet import
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import SideNav from './components/SideNav';
 import MobileHeader from './components/MobileHeader';
 import DashboardPage from './pages/DashboardPage';
@@ -15,12 +16,14 @@ import { User, Transaction, Category } from './types';
 import { MOCK_USER, MOCK_TRANSACTIONS, MOCK_CATEGORIES } from './data/mockData';
 
 // Main layout for authenticated users
+// FIX: Updated props for MainLayout to accept children and the correct type for setIsMobileNavOpen
 const MainLayout: React.FC<{
   user: User;
   onLogout: () => void;
   isMobileNavOpen: boolean;
-  setIsMobileNavOpen: (isOpen: boolean) => void;
-}> = ({ user, onLogout, isMobileNavOpen, setIsMobileNavOpen }) => {
+  setIsMobileNavOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  children: React.ReactNode;
+}> = ({ user, onLogout, isMobileNavOpen, setIsMobileNavOpen, children }) => {
   const location = useLocation();
 
   useEffect(() => {
@@ -39,7 +42,8 @@ const MainLayout: React.FC<{
         <MobileHeader onMenuClick={() => setIsMobileNavOpen(true)} />
         <main className="flex-1 p-6 sm:p-8 md:p-10 overflow-y-auto mt-16 md:mt-0">
           <div className="max-w-7xl mx-auto">
-            <Outlet />
+            {/* FIX: Render children instead of Outlet */}
+            {children}
           </div>
         </main>
       </div>
