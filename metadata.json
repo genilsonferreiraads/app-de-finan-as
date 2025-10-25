@@ -1,0 +1,5 @@
+{
+  "name": "Finance Dashboard",
+  "description": "A comprehensive web application to manage your personal finances. Track income, expenses, view detailed reports, manage categories, and update your profile.",
+  "requestFramePermissions": []
+}
